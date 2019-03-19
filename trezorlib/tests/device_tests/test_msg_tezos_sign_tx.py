@@ -23,6 +23,7 @@ from trezorlib.tools import parse_path
 from .common import TrezorTest
 
 TEZOS_PATH = parse_path("m/44'/1729'/0'")
+TEZOS_PATH_10 = parse_path("m/44'/1729'/10'")
 
 
 @pytest.mark.tezos
@@ -194,3 +195,117 @@ class TestMsgTezosSignTx(TrezorTest):
         assert (
             resp.operation_hash == "oocgc3hyKsGHPsw6WFWJpWT8jBwQLtebQAXF27KNisThkzoj635"
         )
+
+    def test_tezos_sign_tx_proposal(self):
+        self.setup_mnemonic_allallall()
+
+        resp = tezos.sign_tx(
+            self.client,
+            TEZOS_PATH_10,
+            dict_to_proto(
+                messages.TezosSignTx,
+                {
+                    "branch": "b97e2c878b8ffce2c56994e2152d4b9953c197dedba127d0fe71afe1875815ff",
+                    "proposal": {
+                        "source": "0002298c03ed7d454a101eb7022bc95f7e5f41ac78",
+                        "period": 1,
+                        "bytes_in_next_field": 32,
+                        "proposals": "def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e3" #4b97fecfb647aea5dad9675f649c4af90ffe58116a3da5393383877355e3ff7a
+                    },
+                },
+            ),
+        )
+        assert (
+            resp.signature
+            == "edsigu5Fc7WkBR3qohkYCKyuDP5mrcXDDXsA9JAD7Gcg1s99pJiQVQKy1ESnyQxCoVJMYeGvN3ARXFKLB5zHPXFrjuyvGe6Xhix"
+        )
+        # assert (
+        #     resp.sig_op_contents.hex()
+        #     == "b97e2c878b8ffce2c56994e2152d4b9953c197dedba127d0fe71afe1875815ff050002298c03ed7d454a101eb7022bc95f7e5f41ac780000000100000020def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e3"
+        # )
+
+    def test_tezos_sing_tx_ballot_yay(self):
+        self.setup_mnemonic_allallall()
+
+        resp = tezos.sign_tx(
+            self.client,
+            TEZOS_PATH_10,
+            dict_to_proto(
+                messages.TezosSignTx,
+                {
+                    "branch": "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395",
+                    "ballot": {
+                        "source": "0002298c03ed7d454a101eb7022bc95f7e5f41ac78",
+                        "period": 2,
+                        "proposal": "def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e3",
+                        "ballot": "00"
+                    },
+                }
+            )
+        )
+
+        assert (
+            resp.signature
+            == "edsigtkxNm6YXwtV24DqeuimeZFTeFCn2jDYheSsXT4rHMcEjNvzsiSo55nVyVsQxtEe8M7U4PWJWT4rGYYGckQCgtkNJkd2roX"
+        )
+        # assert (
+        #     resp.sig_op_contents.hex()
+        #     == "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395060002298c03ed7d454a101eb7022bc95f7e5f41ac7800000002def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e300"
+        # )
+
+    def test_tezos_sing_tx_ballot_nay(self):
+        self.setup_mnemonic_allallall()
+
+        resp = tezos.sign_tx(
+            self.client,
+            TEZOS_PATH_10,
+            dict_to_proto(
+                messages.TezosSignTx,
+                {
+                    "branch": "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395",
+                    "ballot": {
+                        "source": "0002298c03ed7d454a101eb7022bc95f7e5f41ac78",
+                        "period": 2,
+                        "proposal": "def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e3",
+                        "ballot": "01"
+                    },
+                }
+            )
+        )
+        assert (
+                resp.signature
+                == "edsigtqLaizfF6Cfc2JQL7TrsyniGhpZEojZAKMFW6AeudaUoU8KGXEHJH69Q4Lf27qFyUSTfbeHNnnCt69SGEPWkmpkgkgqMbL"
+        )
+        # assert (
+        #         resp.sig_op_contents.hex()
+        #         == "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395060002298c03ed7d454a101eb7022bc95f7e5f41ac7800000002def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e301"
+        # )
+
+    def test_tezos_sing_tx_ballot_pass(self):
+        self.setup_mnemonic_allallall()
+
+        resp = tezos.sign_tx(
+            self.client,
+            TEZOS_PATH_10,
+            dict_to_proto(
+                messages.TezosSignTx,
+                {
+                    "branch": "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395",
+                    "ballot": {
+                        "source": "0002298c03ed7d454a101eb7022bc95f7e5f41ac78",
+                        "period": 2,
+                        "proposal": "def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e3",
+                        "ballot": "02"
+                    },
+                }
+            )
+        )
+
+        assert (
+                resp.signature
+                == "edsigu6YX7EegPwrpcEbdNQsNhrRiEagBNGJBmFamP4mixZZw1UynhahGQ8RNiZLSUVLERUZwygrsSVenBqXGt9VnknTxtzjKzv"
+        )
+        # assert (
+        #         resp.sig_op_contents.hex()
+        #         == "3a8f60c4cd394cee5b50136c7fc8cb157e8aaa476a9e5c68709be6fc1cdb5395060002298c03ed7d454a101eb7022bc95f7e5f41ac7800000002def7ed9c84af23ab37ebb60dd83cd103d1272ad6c63d4c05931567e65ed027e302"
+        # )
